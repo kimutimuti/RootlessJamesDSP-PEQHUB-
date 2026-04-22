@@ -1,0 +1,15 @@
+@echo off
+setlocal
+
+set "OPENAI_BASE_URL=http://192.168.0.175:1234/v1"
+set "OPENAI_API_KEY=lm-studio"
+set "OPENAI_API_BASE="
+set "OPENAI_BASEURL="
+set "OPENAI_HOST="
+set "OPENAI_PORT="
+
+set "WSLENV=OPENAI_BASE_URL/u:OPENAI_API_KEY/u:OPENAI_API_BASE/u:OPENAI_BASEURL/u:OPENAI_HOST/u:OPENAI_PORT/u:%WSLENV%"
+
+call C:\JamesDSP\forge.bat
+
+endlocal
