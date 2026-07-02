@@ -1,3 +1,4 @@
+#enable workflow.
 name: Build signed app
 on:
   pull_request:
