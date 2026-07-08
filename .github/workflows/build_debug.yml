@@ -1,0 +1,83 @@
+name: Build debug app
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build app
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        flavor: [Rootless]
+        
+    steps:
+      - id: flavor
+        uses: ASzc/change-string-case-action@v5
+        with:
+          string: ${{ matrix.flavor }}
+          
+      - name: Install packages
+        run: |
+          sudo apt update
+          sudo apt install rename
+    
+      - name: Clone repo
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Validate Gradle Wrapper
+        uses: gradle/wrapper-validation-action@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: adopt
+
+    
+      - name: Build debug app
+        uses: gradle/gradle-command-action@v2
+        with:
+          arguments: assemble${{ matrix.flavor }}FullDebug
+
+    
+      - name: Upload build artifact (universal)
+        uses: actions/upload-artifact@v4
+        with:
+          name: "${{ matrix.flavor }}JamesDSP-universal-debug_apk"
+          path: app/build/outputs/apk/${{ steps.flavor.outputs.lowercase }}Full/debug/*universal-debug.apk
+
+      - name: Upload build artifact (x86)
+        uses: actions/upload-artifact@v4
+        with:
+          name: "${{ matrix.flavor }}JamesDSP-x86-debug_apk"
+          path: app/build/outputs/apk/${{ steps.flavor.outputs.lowercase }}Full/debug/*x86-debug.apk
+          
+      - name: Upload build artifact (x86_64)
+        uses: actions/upload-artifact@v4
+        with:
+          name: "${{ matrix.flavor }}JamesDSP-x86_64-debug_apk"
+          path: app/build/outputs/apk/${{ steps.flavor.outputs.lowercase }}Full/debug/*x86_64-debug.apk
+          
+      - name: Upload build artifact (armeabi-v7a)
+        uses: actions/upload-artifact@v4
+        with:
+          name: "${{ matrix.flavor }}JamesDSP-armeabi-v7a-debug_apk"
+          path: app/build/outputs/apk/${{ steps.flavor.outputs.lowercase }}Full/debug/*armeabi-v7a-debug.apk
+               
+      - name: Upload build artifact (arm64-v8a)
+        uses: actions/upload-artifact@v4
+        with:
+          name: "${{ matrix.flavor }}JamesDSP-arm64-v8a-debug_apk"
+          path: app/build/outputs/apk/${{ steps.flavor.outputs.lowercase }}Full/debug/*arm64-v8a-debug.apk
